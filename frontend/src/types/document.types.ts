@@ -1,0 +1,37 @@
+export enum DocumentType {
+  INVOICE = 'invoice',
+  CONTRACT = 'contract',
+  REPORT = 'report',
+  UNKNOWN = 'unknown',
+}
+
+export enum DocumentStatus {
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+}
+
+export interface Document {
+  id: string;
+  originalName: string;
+  fileSize: number;
+  mimeType: string;
+  documentType: DocumentType;
+  status: DocumentStatus;
+  extractedData: Record<string, unknown> | null;
+  errorMessage: string | null;
+  confidenceScore: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type UploadResponse = Document;
+
+export interface ApiError {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  method: string;
+  message: string | string[];
+}

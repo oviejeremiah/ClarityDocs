@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Document } from '../documents/entities/document.entity';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { Document } from '../documents/entities/document.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'clarity_docs'),
-        entities: [Document],
+        entities: [Document, User],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging: config.get<string>('NODE_ENV') === 'development',
         ssl:

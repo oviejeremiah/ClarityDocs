@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { Document } from './entities/document.entity';
 import { DocumentStatus } from './enums/document-status.enum';
 import { DocumentType } from './enums/document-type.enum';
-import { GeminiService } from '../gemini/gemini.service';
+import { AiService } from '../gemini/ai.service';
 import { StorageService } from '../storage/storage.service';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class DocumentsService {
   constructor(
     @InjectRepository(Document)
     private readonly documentRepository: Repository<Document>,
-    private readonly geminiService: GeminiService,
+    private readonly geminiService: AiService,
     private readonly storageService: StorageService,
   ) {}
 
@@ -62,17 +62,21 @@ export class DocumentsService {
         mimeType,
       );
 
+      const documentType =
+        classification?.documentType ?? DocumentType.UNKNOWN;
+      const confidence = classification?.confidence ?? 0;
+
       const extractedData = await this.geminiService.extractFromDocument(
         filePath,
         mimeType,
-        classification.documentType,
+        documentType,
       );
 
       await this.documentRepository.update(documentId, {
-        documentType: classification.documentType,
+        documentType,
         status: DocumentStatus.COMPLETED,
         extractedData: extractedData as any,
-        confidenceScore: classification.confidence,
+        confidenceScore: confidence,
         errorMessage: null,
       });
 

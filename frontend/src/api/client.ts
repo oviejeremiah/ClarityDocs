@@ -8,9 +8,22 @@ export const apiClient = axios.create({
   timeout: 30000,
 });
 
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('clarity_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('clarity_token');
+      localStorage.removeItem('clarity_user');
+      window.location.href = '/login';
+    }
     const message =
       error.response?.data?.message ??
       error.message ??

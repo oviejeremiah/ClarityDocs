@@ -1,9 +1,29 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDocument } from '../hooks/useDocuments';
 import { ExtractionResult } from '../components/ExtractionResult/ExtractionResult';
-import { StatusBadge, TypeBadge } from '../components/StatusBadge/StatusBadge';
 import { ErrorBanner } from '../components/ErrorBanner/ErrorBanner';
-import { DocumentStatus } from '../types/document.types';
+import { DocumentStatus, DocumentType } from '../types/document.types';
+
+function TypeBadge({ type }: { type: DocumentType }) {
+  const map: Record<DocumentType, string> = {
+    [DocumentType.INVOICE]: 'badge--invoice',
+    [DocumentType.CONTRACT]: 'badge--contract',
+    [DocumentType.REPORT]: 'badge--report',
+    [DocumentType.UNKNOWN]: 'badge--unknown',
+  };
+  return <span className={`badge ${map[type]}`}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>;
+}
+
+function StatusBadge({ status }: { status: DocumentStatus }) {
+  const map: Record<DocumentStatus, { cls: string; label: string }> = {
+    [DocumentStatus.COMPLETED]: { cls: 'badge--invoice', label: 'Completed' },
+    [DocumentStatus.PROCESSING]: { cls: 'badge--report', label: 'Processing' },
+    [DocumentStatus.PENDING]: { cls: 'badge--unknown', label: 'Pending' },
+    [DocumentStatus.FAILED]: { cls: '', label: 'Failed' },
+  };
+  const { cls, label } = map[status];
+  return <span className={`badge ${cls}`} style={status === DocumentStatus.FAILED ? { background: 'var(--color-danger-bg)', color: 'var(--color-danger-text)' } : {}}>{label}</span>;
+}
 
 export function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -12,69 +32,57 @@ export function DocumentDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="page">
-        <div className="loading">Loading document…</div>
+      <div className="loading">
+        <div className="spinner" />
+        Loading document…
       </div>
     );
   }
 
   if (isError || !document) {
     return (
-      <div className="page">
-        <div className="page__main">
-          <ErrorBanner message={error?.message ?? 'Document not found'} />
-          <button className="btn btn--secondary" onClick={() => navigate('/')}>
-            Back to dashboard
-          </button>
-        </div>
+      <div className="page-content">
+        <ErrorBanner message={error?.message ?? 'Document not found'} />
+        <button className="btn btn--secondary btn--sm" onClick={() => navigate('/')}>
+          <i className="ti ti-arrow-left" aria-hidden="true" style={{ fontSize: '14px' }} /> Back
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="page">
-      <header className="page__header">
-        <div className="page__header-inner">
-          <div>
-            <button
-              className="btn btn--ghost btn--sm"
-              onClick={() => navigate('/')}
-            >
-              ← Back
-            </button>
-            <h1 className="page__title page__title--detail">
-              {document.originalName}
-            </h1>
-            <div className="page__badges">
-              <TypeBadge type={document.documentType} />
-              <StatusBadge status={document.status} />
-            </div>
-          </div>
+    <>
+      <div className="detail-header">
+        <a className="detail-header__back" onClick={() => navigate('/')}>
+          <i className="ti ti-arrow-left" aria-hidden="true" style={{ fontSize: '14px' }} />
+          Documents
+        </a>
+        <span className="detail-header__divider">/</span>
+        <span className="detail-header__name">{document.originalName}</span>
+        <div className="detail-header__badges">
+          <TypeBadge type={document.documentType} />
+          <StatusBadge status={document.status} />
         </div>
-      </header>
+      </div>
 
-      <main className="page__main">
-        {document.status === DocumentStatus.PROCESSING ||
-        document.status === DocumentStatus.PENDING ? (
+      <div className="page-content">
+        {document.status === DocumentStatus.PROCESSING || document.status === DocumentStatus.PENDING ? (
           <div className="processing-state">
-            <div className="spinner spinner--lg" />
-            <p className="processing-state__text">
-              AI is extracting data from your document…
-            </p>
+            <div className="spinner" style={{ width: '32px', height: '32px', borderWidth: '3px' }} />
+            <div className="processing-state__text">AI is extracting data from your document…</div>
           </div>
         ) : document.status === DocumentStatus.FAILED ? (
           <div className="failed-state">
-            <ErrorBanner
-              message={document.errorMessage ?? 'Processing failed'}
-            />
+            <ErrorBanner message={document.errorMessage ?? 'Processing failed'} />
           </div>
         ) : document.extractedData ? (
           <ExtractionResult
             documentType={document.documentType}
             data={document.extractedData}
+            documentName={document.originalName}
           />
         ) : null}
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

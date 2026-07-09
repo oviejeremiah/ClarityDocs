@@ -7,6 +7,7 @@ import {
   Param,
   UploadedFile,
   UseInterceptors,
+  UseGuards,
   HttpCode,
   HttpStatus,
   Logger,
@@ -26,8 +27,10 @@ import {
 import { DocumentsService } from './documents.service';
 import { Document } from './entities/document.entity';
 import { FileValidationPipe } from '../common/pipes/file-validation.pipe';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('documents')
+@UseGuards(JwtAuthGuard)
 @Controller('api/documents')
 export class DocumentsController {
   private readonly logger = new Logger(DocumentsController.name);
@@ -38,16 +41,17 @@ export class DocumentsController {
   @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (_req, file, cb) => {
-          const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
-          cb(null, uniqueName);
-        },
-      }),
-    }),
+  storage: diskStorage({
+    destination: './uploads',
+    filename: (_req, file, cb) => {
+      const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
+      cb(null, uniqueName);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 },
+}),
   )
-  @ApiOperation({ summary: 'Upload a PDF document for AI processing' })
+  @ApiOperation({ summary: 'Upload a document for AI processing' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -58,7 +62,7 @@ export class DocumentsController {
     },
   })
   @ApiResponse({ status: 202, description: 'Document accepted for processing', type: Document })
-  @ApiResponse({ status: 400, description: 'Invalid file type or size' })
+  @ApiResponse({ status: 400, description: 'Invalid file type or size. Accepted formats: PDF, JPEG, PNG, WEBP, GIF, CSV, XLSX, XLS, DOCX, TXT' })
   async upload(
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
   ): Promise<Document> {

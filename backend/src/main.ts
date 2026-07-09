@@ -2,20 +2,40 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'],
+  });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 3000);
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
 
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      contentSecurityPolicy: nodeEnv === 'production' ? undefined : false,
+    }),
+  );
+
+  const allowedOrigins =
+    nodeEnv === 'production'
+      ? [configService.get<string>('FRONTEND_URL', 'https://claritydocs.com')]
+      : [
+          'http://localhost:5173',
+          'http://localhost:3000',
+          'http://localhost:80',
+        ];
+
   app.enableCors({
-    origin: nodeEnv === 'production' ? false : 'http://localhost:5173',
-    methods: ['GET', 'POST', 'DELETE'],
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
   app.useGlobalPipes(
@@ -23,29 +43,35 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      transformOptions: { enableImplicitConversion: true },
     }),
   );
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(configService.get<string>('SWAGGER_TITLE', 'ClarityDocs API'))
-    .setDescription(
-      configService.get<string>(
-        'SWAGGER_DESCRIPTION',
-        'AI-powered document intelligence platform',
-      ),
-    )
-    .setVersion(configService.get<string>('SWAGGER_VERSION', '1.0'))
-    .addTag('documents', 'Document processing endpoints')
-    .build();
+  if (nodeEnv !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(configService.get<string>('SWAGGER_TITLE', 'ClarityDocs API'))
+      .setDescription(
+        configService.get<string>(
+          'SWAGGER_DESCRIPTION',
+          'AI-powered document intelligence platform',
+        ),
+      )
+      .setVersion(configService.get<string>('SWAGGER_VERSION', '1.0'))
+      .addBearerAuth()
+      .addTag('auth', 'Authentication endpoints')
+      .addTag('documents', 'Document processing endpoints')
+      .addTag('health', 'Health check endpoints')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document, {
-    swaggerOptions: { persistAuthorization: true },
-  });
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: { persistAuthorization: true },
+    });
+    logger.log(`Swagger docs at http://localhost:${port}/api/docs`);
+  }
 
   await app.listen(port);
   logger.log(`ClarityDocs API running on http://localhost:${port}`);
-  logger.log(`Swagger docs at http://localhost:${port}/api/docs`);
   logger.log(`Environment: ${nodeEnv}`);
 }
 

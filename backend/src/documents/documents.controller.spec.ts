@@ -79,7 +79,9 @@ describe('DocumentsController', () => {
     it('should return a document by id', async () => {
       mockDocumentsService.findOne.mockResolvedValue(mockDocument);
       const result = await controller.findOne(mockDocument.id);
-      expect(mockDocumentsService.findOne).toHaveBeenCalledWith(mockDocument.id);
+      expect(mockDocumentsService.findOne).toHaveBeenCalledWith(
+        mockDocument.id,
+      );
       expect(result).toEqual(mockDocument);
     });
   });
@@ -89,7 +91,9 @@ describe('DocumentsController', () => {
       const reprocessed = { ...mockDocument, status: DocumentStatus.PENDING };
       mockDocumentsService.reprocess.mockResolvedValue(reprocessed);
       const result = await controller.reprocess(mockDocument.id);
-      expect(mockDocumentsService.reprocess).toHaveBeenCalledWith(mockDocument.id);
+      expect(mockDocumentsService.reprocess).toHaveBeenCalledWith(
+        mockDocument.id,
+      );
       expect(result.status).toBe(DocumentStatus.PENDING);
     });
   });

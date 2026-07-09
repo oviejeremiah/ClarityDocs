@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { useUploadDocument } from '../../hooks/useUploadDocument';
 import { ErrorBanner } from '../ErrorBanner/ErrorBanner';
 
-export function UploadZone() {
+export function UploadZone({ onSuccess }: { onSuccess?: () => void }) {
   const { mutate: upload, isPending, error } = useUploadDocument();
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -20,7 +20,8 @@ export function UploadZone() {
 
       const file = acceptedFiles[0];
       upload(file, {
-        onError: (err) => setLocalError(err.message),
+       onSuccess: () => onSuccess?.(),
+       onError: (err) => setLocalError(err.message),
       });
     },
     [upload],
@@ -28,8 +29,19 @@ export function UploadZone() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'application/pdf': ['.pdf'] },
-    maxSize: 10 * 1024 * 1024,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png': ['.png'],
+      'image/webp': ['.webp'],
+      'image/gif': ['.gif'],
+      'text/csv': ['.csv'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'text/plain': ['.txt'],
+    },
+    maxSize: 20 * 1024 * 1024,
     multiple: false,
     disabled: isPending,
   });
@@ -56,8 +68,8 @@ export function UploadZone() {
           </div>
         ) : (
           <div className="upload-zone__content">
-            <div className="upload-zone__icon" aria-hidden="true">
-              📄
+            <div className="upload-zone__icon">
+              <i className="ti ti-cloud-upload" aria-hidden="true" style={{ fontSize: '20px' }} />
             </div>
             <p className="upload-zone__text">
               {isDragActive
@@ -65,7 +77,7 @@ export function UploadZone() {
                 : 'Drag and drop a PDF, or click to browse'}
             </p>
             <p className="upload-zone__hint">
-              Supports invoices, contracts and reports · Max 10MB
+              PDF · JPEG · PNG · CSV · XLSX · DOCX · TXT · Max 20MB
             </p>
             <button className="btn btn--primary" type="button" disabled={isPending}>
               Choose file

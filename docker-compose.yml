@@ -27,13 +27,14 @@ services:
     container_name: claritydocs_backend
     restart: unless-stopped
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 3000
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: clarity_docs
+      DB_SSL: 'false'
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       GEMINI_MODEL: gemini-1.5-flash
       MAX_FILE_SIZE_MB: 10

@@ -6,7 +6,7 @@ import { DocumentsService } from './documents.service';
 import { Document } from './entities/document.entity';
 import { DocumentType } from './enums/document-type.enum';
 import { DocumentStatus } from './enums/document-status.enum';
-import { GeminiService } from '../gemini/gemini.service';
+import { AiService } from '../gemini/ai.service';
 import { StorageService } from '../storage/storage.service';
 
 const mockDocument: Document = {
@@ -33,7 +33,7 @@ const mockRepository = {
   remove: jest.fn(),
 };
 
-const mockGeminiService = {
+const mockAiService = {
   classifyDocument: jest.fn(),
   extractFromDocument: jest.fn(),
 };
@@ -54,7 +54,7 @@ describe('DocumentsService', () => {
           provide: getRepositoryToken(Document),
           useValue: mockRepository,
         },
-        { provide: GeminiService, useValue: mockGeminiService },
+        { provide: AiService, useValue: mockAiService },
         { provide: StorageService, useValue: mockStorageService },
       ],
     }).compile();

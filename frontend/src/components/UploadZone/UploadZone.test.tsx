@@ -55,7 +55,7 @@ describe('UploadZone', () => {
   it('renders the supported formats hint', () => {
     renderWithQuery(<UploadZone />);
     expect(
-      screen.getByText(/supports invoices, contracts and reports/i),
+      screen.getByText(/pdf.*jpeg.*png.*csv.*xlsx.*docx.*txt/i),
     ).toBeInTheDocument();
   });
 

@@ -4,6 +4,11 @@ import { BrowserRouter, Routes, Route, Navigate, NavLink } from 'react-router-do
 import { DashboardPage } from './pages/DashboardPage';
 import { DocumentDetailPage } from './pages/DocumentDetailPage';
 import { LoginPage } from './pages/LoginPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
+import { HistoryPage } from './pages/HistoryPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { TeamPage } from './pages/TeamPage';
+import { IntegrationsPage } from './pages/IntegrationsPage';
 import { ThemeSwitcher, getStoredWallpaper, type WallpaperId } from './components/ThemeSwitcher/ThemeSwitcher';
 
 const queryClient = new QueryClient({
@@ -48,28 +53,32 @@ function Sidebar() {
         </div>
       </div>
       <nav className="sidebar__nav">
-        <div style={{ padding: '12px 10px 4px', fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 500 }}>Workspace</div>
+        <div className="sidebar__section">Workspace</div>
         <NavLink to="/" end className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
           <i className="ti ti-files" aria-hidden="true" />
           Documents
         </NavLink>
-        <a className="sidebar__item" style={{ cursor: 'default', opacity: .5 }}>
+        <NavLink to="/analytics" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
           <i className="ti ti-chart-bar" aria-hidden="true" />
           Analytics
-        </a>
-        <a className="sidebar__item" style={{ cursor: 'default', opacity: .5 }}>
+        </NavLink>
+        <NavLink to="/history" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
           <i className="ti ti-clock-history" aria-hidden="true" />
           History
-        </a>
-        <div style={{ padding: '12px 10px 4px', fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 500, marginTop: '8px' }}>Settings</div>
-        <a className="sidebar__item" style={{ cursor: 'default', opacity: .5 }}>
+        </NavLink>
+        <div className="sidebar__section" style={{ marginTop: '8px' }}>Settings</div>
+        <NavLink to="/team" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
           <i className="ti ti-users" aria-hidden="true" />
           Team
-        </a>
-        <a className="sidebar__item" style={{ cursor: 'default', opacity: .5 }}>
+        </NavLink>
+        <NavLink to="/integrations" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
           <i className="ti ti-api" aria-hidden="true" />
           Integrations
-        </a>
+        </NavLink>
+        <NavLink to="/settings" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
+          <i className="ti ti-settings" aria-hidden="true" />
+          Settings
+        </NavLink>
       </nav>
       <div className="sidebar__bottom">
         <div className="sidebar__user" onClick={handleSignOut} title="Sign out">
@@ -107,16 +116,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={
-            <ProtectedRoute>
-              <AppLayout><DashboardPage /></AppLayout>
-            </ProtectedRoute>
-          } />
-          <Route path="/documents/:id" element={
-            <ProtectedRoute>
-              <AppLayout><DocumentDetailPage /></AppLayout>
-            </ProtectedRoute>
-          } />
+          <Route path="/" element={<ProtectedRoute><AppLayout><DashboardPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/documents/:id" element={<ProtectedRoute><AppLayout><DocumentDetailPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><AppLayout><AnalyticsPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/team" element={<ProtectedRoute><AppLayout><TeamPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/integrations" element={<ProtectedRoute><AppLayout><IntegrationsPage /></AppLayout></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

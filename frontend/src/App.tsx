@@ -1,3 +1,4 @@
+import { ClarityGuide } from './components/ClarityGuide/ClarityGuide';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate, NavLink } from 'react-router-dom';
@@ -10,6 +11,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { TeamPage } from './pages/TeamPage';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { ThemeSwitcher, getStoredWallpaper, type WallpaperId } from './components/ThemeSwitcher/ThemeSwitcher';
+import { EvalsPage } from './pages/EvalsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 2, staleTime: 0 } },
@@ -66,6 +68,10 @@ function Sidebar() {
           <i className="ti ti-clock-history" aria-hidden="true" />
           History
         </NavLink>
+        <NavLink to="/evals" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
+          <i className="ti ti-target-arrow" aria-hidden="true" />
+          Evals
+        </NavLink>
         <div className="sidebar__section" style={{ marginTop: '8px' }}>Settings</div>
         <NavLink to="/team" className={({ isActive }) => `sidebar__item${isActive ? ' active' : ''}`}>
           <i className="ti ti-users" aria-hidden="true" />
@@ -105,6 +111,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           <ThemeSwitcher current={wallpaper} onChange={setWallpaper} />
         </div>
         {children}
+        <ClarityGuide />
       </main>
     </div>
   );
@@ -120,6 +127,7 @@ function App() {
           <Route path="/documents/:id" element={<ProtectedRoute><AppLayout><DocumentDetailPage /></AppLayout></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><AppLayout><AnalyticsPage /></AppLayout></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />
+          <Route path="/evals" element={<ProtectedRoute><AppLayout><EvalsPage /></AppLayout></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
           <Route path="/team" element={<ProtectedRoute><AppLayout><TeamPage /></AppLayout></ProtectedRoute>} />
           <Route path="/integrations" element={<ProtectedRoute><AppLayout><IntegrationsPage /></AppLayout></ProtectedRoute>} />

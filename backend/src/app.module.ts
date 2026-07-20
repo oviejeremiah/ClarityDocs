@@ -7,6 +7,8 @@ import { DocumentsModule } from './documents/documents.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
+import { ProviderLogsModule } from './provider-logs/provider-logs.module';
+import { EvalsModule } from './evals/evals.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -33,6 +35,8 @@ import configuration, { validationSchema } from './config/configuration';
     UsersModule,
     DocumentsModule,
     HealthModule,
+    ProviderLogsModule,
+    EvalsModule,
   ],
   providers: [
     {

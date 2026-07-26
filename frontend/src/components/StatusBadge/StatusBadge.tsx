@@ -25,27 +25,44 @@ const statusConfig: Record<DocumentStatus, { label: string; className: string }>
     label: 'Failed',
     className: 'badge badge--failed',
   },
-};
+}
 
-const typeConfig: Record<DocumentType, { label: string; className: string }> =
-  {
-    [DocumentType.INVOICE]: {
-      label: 'Invoice',
-      className: 'badge badge--invoice',
-    },
-    [DocumentType.CONTRACT]: {
-      label: 'Contract',
-      className: 'badge badge--contract',
-    },
-    [DocumentType.REPORT]: {
-      label: 'Report',
-      className: 'badge badge--report',
-    },
-    [DocumentType.UNKNOWN]: {
-      label: 'Unknown',
-      className: 'badge badge--unknown',
-    },
-  };
+const typeConfig: Record<DocumentType, { label: string; className: string }> = {
+  [DocumentType.INVOICE]: {
+    label: 'Invoice',
+    className: 'badge badge--invoice',
+  },
+
+  [DocumentType.CONTRACT]: {
+    label: 'Contract',
+    className: 'badge badge--contract',
+  },
+
+  [DocumentType.REPORT]: {
+    label: 'Report',
+    className: 'badge badge--report',
+  },
+
+  [DocumentType.BANK_STATEMENT]: {
+    label: 'Bank Statement',
+    className: 'badge badge--bank-statement',
+  },
+
+  [DocumentType.EXPENSE_VOUCHER]: {
+    label: 'Expense Voucher',
+    className: 'badge badge--expense-voucher',
+  },
+
+  [DocumentType.PAYROLL_RECORD]: {
+    label: 'Payroll Record',
+    className: 'badge badge--payroll-record',
+  },
+
+  [DocumentType.UNKNOWN]: {
+    label: 'Unknown',
+    className: 'badge badge--unknown',
+  },
+}
 
 export function StatusBadge({ status }: StatusBadgeProps) {
   const config = statusConfig[status];

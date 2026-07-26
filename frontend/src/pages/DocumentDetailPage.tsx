@@ -9,9 +9,21 @@ function TypeBadge({ type }: { type: DocumentType }) {
     [DocumentType.INVOICE]: 'badge--invoice',
     [DocumentType.CONTRACT]: 'badge--contract',
     [DocumentType.REPORT]: 'badge--report',
+    [DocumentType.BANK_STATEMENT]: 'badge--report',
+    [DocumentType.EXPENSE_VOUCHER]: 'badge--invoice',
+    [DocumentType.PAYROLL_RECORD]: 'badge--contract',
     [DocumentType.UNKNOWN]: 'badge--unknown',
   };
-  return <span className={`badge ${map[type]}`}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>;
+  const labels: Record<DocumentType, string> = {
+    [DocumentType.INVOICE]: 'Invoice',
+    [DocumentType.CONTRACT]: 'Contract',
+    [DocumentType.REPORT]: 'Report',
+    [DocumentType.BANK_STATEMENT]: 'Bank statement',
+    [DocumentType.EXPENSE_VOUCHER]: 'Expense voucher',
+    [DocumentType.PAYROLL_RECORD]: 'Payroll record',
+    [DocumentType.UNKNOWN]: 'Unknown',
+  };
+  return <span className={`badge ${map[type]}`}>{labels[type]}</span>;
 }
 
 function StatusBadge({ status }: { status: DocumentStatus }) {
@@ -76,11 +88,21 @@ export function DocumentDetailPage() {
             <ErrorBanner message={document.errorMessage ?? 'Processing failed'} />
           </div>
         ) : document.extractedData ? (
-          <ExtractionResult
-            documentType={document.documentType}
-            data={document.extractedData}
-            documentName={document.originalName}
-          />
+          <>
+            {document.needsReview && (
+              <div className="error-banner" style={{ background: 'var(--color-warning-bg)', borderColor: '#fde68a' }}>
+                <span className="error-banner__message" style={{ color: 'var(--color-warning)' }}>
+                  <i className="ti ti-alert-triangle" aria-hidden="true" style={{ marginRight: '6px' }} />
+                  This extraction has lower AI confidence ({Math.round((document.confidenceScore ?? 0) * 100)}%). Please review the details below before relying on them.
+                </span>
+              </div>
+            )}
+            <ExtractionResult
+              documentType={document.documentType}
+              data={document.extractedData}
+              documentName={document.originalName}
+            />
+          </>
         ) : null}
       </div>
     </>

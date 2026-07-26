@@ -66,9 +66,21 @@ function TypeBadge({ type }: { type: DocumentType }) {
     [DocumentType.INVOICE]: 'badge--invoice',
     [DocumentType.CONTRACT]: 'badge--contract',
     [DocumentType.REPORT]: 'badge--report',
+    [DocumentType.BANK_STATEMENT]: 'badge--report',
+    [DocumentType.EXPENSE_VOUCHER]: 'badge--invoice',
+    [DocumentType.PAYROLL_RECORD]: 'badge--contract',
     [DocumentType.UNKNOWN]: 'badge--unknown',
   };
-  return <span className={`badge ${map[type]}`}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>;
+  const labels: Record<DocumentType, string> = {
+    [DocumentType.INVOICE]: 'Invoice',
+    [DocumentType.CONTRACT]: 'Contract',
+    [DocumentType.REPORT]: 'Report',
+    [DocumentType.BANK_STATEMENT]: 'Bank statement',
+    [DocumentType.EXPENSE_VOUCHER]: 'Expense voucher',
+    [DocumentType.PAYROLL_RECORD]: 'Payroll record',
+    [DocumentType.UNKNOWN]: 'Unknown',
+  };
+  return <span className={`badge ${map[type]}`}>{labels[type]}</span>;
 }
 
 function ConfirmDialog({ name, onConfirm, onCancel, isDeleting }: {
@@ -144,6 +156,12 @@ export function DocumentTable({ documents }: DocumentTableProps) {
               </div>
               <div>
                 <ConfidenceBar score={isProcessing ? null : doc.confidenceScore} />
+                {doc.needsReview && !isProcessing && (
+                  <span className="badge" style={{ background: 'var(--color-warning-bg)', color: 'var(--color-warning)', marginTop: '4px', display: 'inline-flex' }}>
+                    <i className="ti ti-alert-triangle" aria-hidden="true" style={{ fontSize: '11px', marginRight: '3px' }} />
+                    Needs review
+                  </span>
+                )}
               </div>
               <div className="doc-row__actions" onClick={e => e.stopPropagation()}>
                 {doc.status === DocumentStatus.COMPLETED && (

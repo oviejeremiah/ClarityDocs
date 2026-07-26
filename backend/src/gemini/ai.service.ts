@@ -11,6 +11,9 @@ import { buildClassifyPrompt } from './prompts/classify.prompt';
 import { buildInvoicePrompt } from './prompts/invoice.prompt';
 import { buildContractPrompt } from './prompts/contract.prompt';
 import { buildReportPrompt } from './prompts/report.prompt';
+import { buildBankStatementPrompt } from './prompts/bank-statement.prompt';
+import { buildExpenseVoucherPrompt } from './prompts/expense-voucher.prompt';
+import { buildPayrollRecordPrompt } from './prompts/payroll-record.prompt';
 import { DocumentType } from '../documents/enums/document-type.enum';
 import { DocumentConverterService } from '../storage/document-converter.service';
 import { StorageService } from '../storage/storage.service';
@@ -111,6 +114,12 @@ export class AiService {
         return buildContractPrompt();
       case DocumentType.REPORT:
         return buildReportPrompt();
+      case DocumentType.BANK_STATEMENT:
+        return buildBankStatementPrompt();
+      case DocumentType.EXPENSE_VOUCHER:
+        return buildExpenseVoucherPrompt();
+      case DocumentType.PAYROLL_RECORD:
+        return buildPayrollRecordPrompt();
       default:
         return buildReportPrompt();
     }

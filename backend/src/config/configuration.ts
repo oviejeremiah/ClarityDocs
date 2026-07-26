@@ -29,6 +29,7 @@ export const validationSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().default('24h'),
 
   MAX_FILE_SIZE_MB: Joi.number().default(20),
+  CONFIDENCE_REVIEW_THRESHOLD: Joi.number().min(0).max(1).default(0.75),
   UPLOAD_DIR: Joi.string().default('./uploads'),
 
   THROTTLE_TTL: Joi.number().default(60),

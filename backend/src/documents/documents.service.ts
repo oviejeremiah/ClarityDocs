@@ -5,6 +5,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Document } from './entities/document.entity';
@@ -22,6 +23,7 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
     private readonly geminiService: AiService,
     private readonly storageService: StorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   async upload(file: Express.Multer.File): Promise<Document> {
@@ -72,13 +74,26 @@ export class DocumentsService {
         documentType,
       );
 
+      const reviewThreshold = this.configService.get<number>(
+        'CONFIDENCE_REVIEW_THRESHOLD',
+        0.75,
+      );
+      const needsReview = classification.confidence < reviewThreshold;
+
       await this.documentRepository.update(documentId, {
-        documentType,
+        documentType: classification.documentType,
         status: DocumentStatus.COMPLETED,
-        extractedData: extractedData as any,
-        confidenceScore: confidence,
+        extractedData: extractedData as unknown as object,
+        confidenceScore: classification.confidence,
+        needsReview,
         errorMessage: null,
       });
+
+      if (needsReview) {
+        this.logger.warn(
+          `Document ${documentId} flagged for review — confidence ${Math.round(classification.confidence * 100)}% below threshold ${Math.round(reviewThreshold * 100)}%`,
+        );
+      }
 
       this.logger.log(`Document ${documentId} processed successfully`);
     } catch (error) {

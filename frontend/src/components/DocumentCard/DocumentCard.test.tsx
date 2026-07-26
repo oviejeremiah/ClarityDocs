@@ -16,6 +16,7 @@ const mockDocument: Document = {
   extractedData: { invoiceNumber: 'INV-001' },
   errorMessage: null,
   confidenceScore: 0.95,
+  needsReview: false,
   createdAt: '2026-06-21T10:00:00.000Z',
   updatedAt: '2026-06-21T10:00:00.000Z',
 };

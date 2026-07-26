@@ -127,7 +127,7 @@ export function DashboardPage() {
         <div className="section-header">
           <div className="section-title">Recent documents</div>
           <div className="filter-row">
-            {(['all', 'invoice', 'contract', 'report'] as const).map(f => (
+            {(['all', 'invoice', 'contract', 'report', 'bank_statement', 'expense_voucher', 'payroll_record'] as const).map(f => (
               <button
                 key={f}
                 className={`filter-btn${filter === f ? ' active' : ''}`}

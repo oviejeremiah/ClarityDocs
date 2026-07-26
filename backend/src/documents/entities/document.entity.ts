@@ -59,6 +59,10 @@ export class Document {
   @Column({ type: 'float', nullable: true })
   confidenceScore!: number | null;
 
+  @ApiProperty({ example: false })
+  @Column({ type: 'boolean', default: false, name: 'needs_review' })
+  needsReview: boolean;
+
   @ApiProperty({ example: '2026-06-21T10:00:00.000Z' })
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt!: Date;

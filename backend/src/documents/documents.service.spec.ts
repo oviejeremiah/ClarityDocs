@@ -1,4 +1,5 @@
 /// <reference types="jest" />
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
@@ -20,6 +21,7 @@ const mockDocument: Document = {
   extractedData: { invoiceNumber: 'INV-001', totalAmount: 1500 },
   errorMessage: null,
   confidenceScore: 0.95,
+  needsReview: false,
   createdAt: new Date('2026-06-21T10:00:00.000Z'),
   updatedAt: new Date('2026-06-21T10:00:00.000Z'),
 };
@@ -56,6 +58,10 @@ describe('DocumentsService', () => {
         },
         { provide: AiService, useValue: mockAiService },
         { provide: StorageService, useValue: mockStorageService },
+        {
+          provide: ConfigService,
+          useValue: { get: jest.fn().mockReturnValue(0.75) },
+        },
       ],
     }).compile();
 

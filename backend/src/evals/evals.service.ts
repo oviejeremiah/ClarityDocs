@@ -84,4 +84,8 @@ export class EvalsService {
       timestamp: new Date().toISOString(),
     };
   }
+
+  getModelRanking() {
+    return this.aiService.getRankingReport();
+  }
 }

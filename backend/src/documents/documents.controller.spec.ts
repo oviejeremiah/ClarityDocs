@@ -9,7 +9,8 @@ import { Document } from './entities/document.entity';
 const mockDocument: Document = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   originalName: 'invoice_001.pdf',
-  filePath: 'uploads/uuid.pdf',
+  storageKey: 'abc123hash.pdf',
+  fileHash: 'abc123hash',
   fileSize: 102400,
   mimeType: 'application/pdf',
   documentType: DocumentType.INVOICE,

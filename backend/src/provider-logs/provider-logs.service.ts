@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { ProviderLog } from './entities/provider-log.entity';
 
 const COST_PER_1K_TOKENS: Record<string, { input: number; output: number }> = {
@@ -19,6 +19,14 @@ export interface LogEntryInput {
   estimatedInputTokens?: number;
   estimatedOutputTokens?: number;
   errorMessage?: string;
+}
+export interface RecentProviderStat {
+  provider: string;
+  calls: number;
+  successRate: number;
+  avgSuccessLatencyMs: number | null;
+  recentFailureStreak: number;
+  lastFailureAt: Date | null;
 }
 
 @Injectable()
@@ -64,6 +72,46 @@ export class ProviderLogsService {
     });
 
     await this.repository.save(record);
+  }
+
+  async getRecentStats(windowMinutes = 60): Promise<RecentProviderStat[]> {
+    const since = new Date(Date.now() - windowMinutes * 60 * 1000);
+    const logs = await this.repository.find({
+      where: { createdAt: MoreThan(since) },
+      order: { createdAt: 'DESC' },
+      take: 2000,
+    });
+
+    const groups = new Map<string, ProviderLog[]>();
+    for (const log of logs) {
+      const group = groups.get(log.provider) ?? [];
+      group.push(log);
+      groups.set(log.provider, group);
+    }
+
+    return Array.from(groups.entries()).map(([provider, group]) => {
+      const successes = group.filter((l) => l.success);
+      let streak = 0;
+      for (const l of group) {
+        if (l.success) break;
+        streak++;
+      }
+      const lastFailure = group.find((l) => !l.success) ?? null;
+      return {
+        provider,
+        calls: group.length,
+        successRate: successes.length / group.length,
+        avgSuccessLatencyMs:
+          successes.length > 0
+            ? Math.round(
+                successes.reduce((sum, l) => sum + l.latencyMs, 0) /
+                  successes.length,
+              )
+            : null,
+        recentFailureStreak: streak,
+        lastFailureAt: lastFailure ? lastFailure.createdAt : null,
+      };
+    });
   }
 
   async getStats(): Promise<{

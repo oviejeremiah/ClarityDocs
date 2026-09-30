@@ -13,9 +13,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { randomUUID } from 'crypto';
 import {
   ApiTags,
   ApiOperation,
@@ -41,15 +38,8 @@ export class DocumentsController {
   @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(
     FileInterceptor('file', {
-  storage: diskStorage({
-    destination: './uploads',
-    filename: (_req, file, cb) => {
-      const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
-      cb(null, uniqueName);
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 },
-}),
+      limits: { fileSize: 20 * 1024 * 1024 },
+    }),
   )
   @ApiOperation({ summary: 'Upload a document for AI processing' })
   @ApiConsumes('multipart/form-data')

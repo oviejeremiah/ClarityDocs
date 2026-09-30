@@ -1,7 +1,6 @@
-import { Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { EvalsService } from './evals.service';
-
 @ApiTags('evals')
 @Controller('api/evals')
 export class EvalsController {
@@ -12,5 +11,10 @@ export class EvalsController {
   @ApiOperation({ summary: 'Run the AI extraction accuracy evaluation suite' })
   run() {
     return this.evalsService.runAll();
+  }
+  @Get('model-ranking')
+  @ApiOperation({ summary: 'Current AI model order, ranked by live performance' })
+  modelRanking() {
+    return this.evalsService.getModelRanking();
   }
 }

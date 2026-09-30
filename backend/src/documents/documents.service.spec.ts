@@ -1,4 +1,5 @@
 /// <reference types="jest" />
+import { ObjectStorageService } from '../storage/object-storage.service';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -13,7 +14,8 @@ import { StorageService } from '../storage/storage.service';
 const mockDocument: Document = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   originalName: 'invoice_001.pdf',
-  filePath: 'uploads/uuid.pdf',
+  storageKey: 'abc123hash.pdf',
+  fileHash: 'abc123hash',
   fileSize: 102400,
   mimeType: 'application/pdf',
   documentType: DocumentType.INVOICE,
@@ -45,6 +47,13 @@ const mockStorageService = {
   fileExists: jest.fn(),
 };
 
+const mockObjectStorageService = {
+  uploadFile: jest.fn(),
+  downloadFile: jest.fn(),
+  deleteFile: jest.fn(),
+  getStorageUrl: jest.fn(),
+};
+
 describe('DocumentsService', () => {
   let service: DocumentsService;
 
@@ -58,6 +67,7 @@ describe('DocumentsService', () => {
         },
         { provide: AiService, useValue: mockAiService },
         { provide: StorageService, useValue: mockStorageService },
+        { provide: ObjectStorageService, useValue: mockObjectStorageService },
         {
           provide: ConfigService,
           useValue: { get: jest.fn().mockReturnValue(0.75) },
@@ -110,8 +120,8 @@ describe('DocumentsService', () => {
       mockRepository.findOne.mockResolvedValue(mockDocument);
       mockRepository.remove.mockResolvedValue(mockDocument);
       await service.remove(mockDocument.id);
-      expect(mockStorageService.deleteFile).toHaveBeenCalledWith(
-        mockDocument.filePath,
+      expect(mockObjectStorageService.deleteFile).toHaveBeenCalledWith(
+        mockDocument.storageKey,
       );
       expect(mockRepository.remove).toHaveBeenCalledWith(mockDocument);
     });
@@ -125,15 +135,8 @@ describe('DocumentsService', () => {
   });
 
   describe('reprocess', () => {
-    it('should throw error when file no longer exists', async () => {
+    it('should reset document status and trigger reprocessing', async () => {
       mockRepository.findOne.mockResolvedValue(mockDocument);
-      mockStorageService.fileExists.mockReturnValue(false);
-      await expect(service.reprocess(mockDocument.id)).rejects.toThrow();
-    });
-
-    it('should reset document status and trigger reprocessing when file exists', async () => {
-      mockRepository.findOne.mockResolvedValue(mockDocument);
-      mockStorageService.fileExists.mockReturnValue(true);
       mockRepository.update.mockResolvedValue(undefined);
       const updatedDoc = { ...mockDocument, status: DocumentStatus.PENDING };
       mockRepository.findOne
@@ -145,8 +148,16 @@ describe('DocumentsService', () => {
         extractedData: null,
         errorMessage: null,
         confidenceScore: null,
+        needsReview: false,
       });
       expect(result.status).toBe(DocumentStatus.PENDING);
+    });
+
+    it('should throw NotFoundException when document does not exist', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+      await expect(service.reprocess('non-existent-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

@@ -1,3 +1,8 @@
+// pdf-parse's CJS/ESM interop is unreliable with `import` — require() sidesteps it.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pdfParse = require('pdf-parse') as (
+  buffer: Buffer,
+) => Promise<{ text: string; numpages: number }>;
 import { Injectable, Logger } from '@nestjs/common';
 import * as XLSX from 'xlsx';
 import * as mammoth from 'mammoth';
@@ -93,14 +98,32 @@ export class DocumentConverterService {
     }
   }
 
+  async pdfToText(filePath: string): Promise<string> {
+    try {
+      const { readFileSync } = await import('fs');
+      const buffer = readFileSync(filePath);
+      const data = await pdfParse(buffer);
+      const text = data.text?.trim() ?? '';
+      this.logger.log(
+        `Converted PDF: ${data.numpages} pages, ${text.length} characters extracted`,
+      );
+      return text;
+    } catch (error) {
+      this.logger.error(`PDF text extraction failed: ${String(error)}`);
+      throw error;
+    }
+  }
+
   async convertToText(
     filePath: string,
     mimeType: string,
   ): Promise<string | null> {
     switch (mimeType) {
+      case 'application/pdf':
+        return this.pdfToText(filePath);
       case 'text/csv':
-        return this.csvToText(filePath);
       case 'application/vnd.ms-excel':
+        return this.csvToText(filePath);
       case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
         return this.xlsxToText(filePath);
       case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':

@@ -19,9 +19,13 @@ export class Document {
   @Column({ type: 'varchar', length: 255 })
   originalName!: string;
 
-  @ApiProperty({ example: 'uploads/a1b2c3d4.pdf' })
+  @ApiProperty({ example: 'minio://claritydocs/a1b2c3d4.pdf' })
   @Column({ type: 'varchar', length: 500 })
-  filePath!: string;
+  storageKey: string;
+
+  @ApiPropertyOptional({ example: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4' })
+  @Column({ type: 'varchar', length: 128, nullable: true, name: 'file_hash' })
+  fileHash: string | null;
 
   @ApiProperty({ example: 102400 })
   @Column({ type: 'int' })

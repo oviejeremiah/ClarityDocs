@@ -24,12 +24,17 @@ export const validationSchema = Joi.object({
   OPENROUTER_MODEL_TERTIARY: Joi.string().default(
     'nvidia/nemotron-3-ultra-550b-a55b:free',
   ),
+  OPENROUTER_MODEL_QUATERNARY: Joi.string().default('z-ai/glm-5.2:free'),
 
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default('24h'),
 
   MAX_FILE_SIZE_MB: Joi.number().default(20),
   CONFIDENCE_REVIEW_THRESHOLD: Joi.number().min(0).max(1).default(0.75),
+  MINIO_ENDPOINT: Joi.string().default('http://localhost:9000'),
+  MINIO_ACCESS_KEY: Joi.string().required(),
+  MINIO_SECRET_KEY: Joi.string().required(),
+  MINIO_BUCKET: Joi.string().default('claritydocs'),
   UPLOAD_DIR: Joi.string().default('./uploads'),
 
   THROTTLE_TTL: Joi.number().default(60),

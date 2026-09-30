@@ -2,7 +2,7 @@
 
 > Turn documents into decisions.
 
-ClarityDocs is a production-grade AI document intelligence platform that automatically extracts and structures data from PDF invoices, contracts, and reports using Google Gemini 1.5 Flash.
+ClarityDocs is a production-grade AI document intelligence platform that automatically extracts and structures data from PDF, DOCX, JPEG, PNG, CSV/XLSX, TXT invoices, contracts, reports, bank statements, expense vouchers and payroll records using Google Gemini 1.5 Flash.
 
 ## Live repository
 

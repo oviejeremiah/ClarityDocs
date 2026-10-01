@@ -13,7 +13,7 @@ ClarityDocs is a production-grade AI document intelligence platform that automat
 | Layer             | Technology                                 |
 | ----------------- | ------------------------------------------ |
 | Backend           | NestJS · TypeScript · TypeORM            |
-| AI                | Google Gemini 1.5 Flash                    |
+| AI                | Google Gemini 2.0 Flash, and other models                   |
 | Database          | PostgreSQL 16                              |
 | Frontend          | React 18 · Vite · TypeScript             |
 | State management  | TanStack React Query                       |
@@ -133,7 +133,7 @@ cd backend && npm run test && cd ../frontend && npx vitest run
 
 ## Architecture decisions
 
-**Google Gemini 1.5 Flash over LangChain** — Gemini reads PDFs natively with a 1 million token context window, eliminating the need for document chunking, embeddings, and retrieval pipelines. LangChain would add abstraction over a flow that does not need it. For projects requiring RAG or multi-agent orchestration, LangChain is the right tool — not here.
+**Google Gemini 2.0 Flash over LangChain** — Gemini reads PDFs natively with a 1 million token context window, eliminating the need for document chunking, embeddings, and retrieval pipelines. LangChain would add abstraction over a flow that does not need it. For projects requiring RAG or multi-agent orchestration, LangChain is the right tool — not here.
 
 **Auto-detection of document type** — The system classifies the document type before extraction, then applies the appropriate structured prompt. Staff do not need to select a document type — they upload and results appear.
 

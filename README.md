@@ -24,9 +24,9 @@ ClarityDocs is a production-grade AI document intelligence platform that automat
 
 ## What it does
 
-Staff upload a PDF document. ClarityDocs automatically:
+Staff upload a document in any desired file type. ClarityDocs automatically:
 
-1. Classifies the document type (invoice, contract, report)
+1. Classifies the document (invoice, bank statement, contract, report,)
 2. Extracts all relevant structured fields using AI
 3. Stores the results in a database
 4. Displays extracted data in a clean, readable interface
